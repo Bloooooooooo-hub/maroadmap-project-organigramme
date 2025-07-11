@@ -13,7 +13,7 @@ import ReactFlow, {
 } from "reactflow"
 import "reactflow/dist/style.css"
 
-// --- UI Components (extraits du code fourni) ---
+// --- UI Components ---
 const Button = ({ children, onClick, className = "", variant = "primary", size = "default", disabled = false }) => {
   const baseClass =
     "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -37,12 +37,12 @@ const Button = ({ children, onClick, className = "", variant = "primary", size =
 }
 
 const PlusIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M12 5v14M5 12h14" />
   </svg>
 )
 const UndoIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
     <path d="M3 3v5h5" />
   </svg>
@@ -51,7 +51,7 @@ const UndoIcon = () => (
 // --- Custom Node ---
 function CustomNode({ id, data }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border-2 border-gray-300 dark:border-gray-600 min-w-[200px] max-w-[300px] p-3">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-600 min-w-[180px] max-w-[300px] p-3">
       <Handle type="target" position={Position.Top} className="w-3 h-3 border-2 border-gray-400 bg-gray-600" />
       <div className="font-semibold text-gray-800 dark:text-white mb-2">{data.label}</div>
       <Handle type="source" position={Position.Bottom} className="w-3 h-3 border-2 border-gray-400 bg-gray-600" />
@@ -79,7 +79,7 @@ export default function MaRoadmapFlow() {
     const newNode: Node = {
       id: `${Date.now()}`,
       type: "customNode",
-      position: { x: 100 + Math.random() * 300, y: 100 + Math.random() * 200 },
+      position: { x: 120 + Math.random() * 300, y: 120 + Math.random() * 200 },
       data: { label: `Section ${nodes.length + 1}` },
     }
     setNodes((nds) => [...nds, newNode])
@@ -97,30 +97,42 @@ export default function MaRoadmapFlow() {
   )
 
   return (
-    <div className={`min-h-screen flex flex-col ${darkMode ? "dark bg-gray-900" : "bg-white"}`}>
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-40 flex items-center px-4 shadow-sm">
-        <span className="font-bold text-lg text-blue-600 dark:text-blue-400">MaRoadMap</span>
-        <div className="ml-auto">
+    <div className={`min-h-screen flex flex-col justify-center items-center ${darkMode ? "dark bg-gray-900" : "bg-white"}`}>
+      {/* Navbar sticky */}
+      <nav className="sticky-navbar">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xl">M</span>
+          </div>
+          <span className="font-bold text-lg text-blue-600 dark:text-blue-400">MaRoadMap</span>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
           <Button variant="outline" onClick={() => setDarkMode((d) => !d)}>
             {darkMode ? "☀️ Mode Jour" : "🌙 Mode Nuit"}
           </Button>
         </div>
       </nav>
-      {/* Contenu principal */}
-      <div className="flex-1 flex flex-col items-center justify-center pt-24 pb-8 px-2">
-        <div className="relative w-full max-w-5xl h-[600px]">
+      {/* Carte centrale */}
+      <main className="main-card flex flex-col items-center justify-center w-full mt-8 mb-8">
+        <div className="w-full h-[600px] max-w-5xl relative">
           {/* Boutons flottants */}
-          <div className="absolute top-4 left-4 z-10 flex gap-2">
-            <Button onClick={addSection} className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-              <PlusIcon />
-              <span className="ml-2">Nouvelle section</span>
-            </Button>
-            <Button onClick={undo} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white" disabled={nodes.length === 0}>
-              <UndoIcon />
-              <span className="ml-2">Annuler</span>
-            </Button>
-          </div>
+          <button
+            className="fab fab-add group"
+            onClick={addSection}
+            title="Nouvelle section"
+          >
+            <PlusIcon />
+            <span className="fab-label">Nouvelle section</span>
+          </button>
+          <button
+            className="fab fab-undo group"
+            onClick={undo}
+            title="Annuler"
+            disabled={nodes.length === 0}
+          >
+            <UndoIcon />
+            <span className="fab-label">Annuler</span>
+          </button>
           {/* React Flow */}
           <ReactFlow
             nodes={nodes}
@@ -130,13 +142,13 @@ export default function MaRoadmapFlow() {
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             fitView
-            className={darkMode ? "dark" : ""}
+            className={`w-full h-full rounded-2xl border border-blue-100 dark:border-gray-700 shadow-lg ${darkMode ? "dark" : ""}`}
           >
             <Background color={darkMode ? "#374151" : "#E5E7EB"} />
             <Controls className={darkMode ? "dark" : ""} />
           </ReactFlow>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
