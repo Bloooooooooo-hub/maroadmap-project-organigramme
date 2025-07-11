@@ -1,10 +1,9 @@
 import RoadmapEditor from "@/components/roadmap/RoadmapEditor"
 
 export default function HomePage() {
-  // Cette page sert simplement de point d'entrée pour votre application principale.
   return (
-    <main>
+    <div className="w-full h-full flex flex-col items-center justify-center">
       <RoadmapEditor />
-    </main>
+    </div>
   )
 }
