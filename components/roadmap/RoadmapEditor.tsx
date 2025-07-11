@@ -7,6 +7,7 @@ import ReactFlow, {
   useEdgesState,
   Background,
   Controls,
+  MiniMap,
   type Connection,
   type Edge,
 } from "reactflow"
@@ -135,6 +136,15 @@ export default function RoadmapEditor() {
   const stats = getCompletionStats()
   const save = () => setShowEmailModal(true)
 
+  // --- UI ENHANCEMENTS ---
+
+  // Couleurs pour la mini-map
+  const nodeColor = (node: any) => {
+    if (node.data.status === "success") return "#10B981"
+    if (node.data.status === "loading") return "#3B82F6"
+    return "#F59E42"
+  }
+
   return (
     <div className={`h-screen flex flex-col ${darkMode ? "dark bg-gray-900" : "bg-white"}`}>
       <FixedNavbar setSidebarOpen={setSidebarOpen} />
@@ -152,21 +162,52 @@ export default function RoadmapEditor() {
         stats={stats}
       />
       <FloatingActionButtons addSection={addSection} undo={undo} />
-      <div className="flex-1 mt-16">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          fitView
-          className={darkMode ? "dark" : ""}
-        >
-          <Background color={darkMode ? "#374151" : "#E5E7EB"} />
-          <Controls />
-        </ReactFlow>
+      <div className="flex-1 mt-16 relative">
+        <div className="absolute inset-0 p-4">
+          <div className="h-full w-full rounded-2xl shadow-2xl bg-gradient-to-br from-blue-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden relative">
+            {nodes.length === 0 && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
+                <div className="text-5xl mb-4">🗺️</div>
+                <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">Commencez votre roadmap !</h2>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Cliquez sur <span className="font-semibold text-blue-600">"Nouvelle section"</span> pour ajouter une étape.
+                </p>
+              </div>
+            )}
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              fitView
+              className={darkMode ? "dark" : ""}
+            >
+              <Background
+                variant="lines"
+                gap={32}
+                color={darkMode ? "#374151" : "#c7d2fe"}
+                lineWidth={1.5}
+              />
+              <MiniMap
+                nodeColor={nodeColor}
+                nodeStrokeWidth={3}
+                maskColor={darkMode ? "rgba(30,41,59,0.7)" : "rgba(59,130,246,0.08)"}
+                className="rounded-lg shadow-lg border border-blue-200 dark:border-gray-700"
+                pannable
+                zoomable
+              />
+              <Controls
+                showInteractive={false}
+                position="top-right"
+                className="!top-6 !right-6 scale-125"
+                style={{ background: "rgba(255,255,255,0.85)", borderRadius: "0.75rem", boxShadow: "0 2px 8px #0001" }}
+              />
+            </ReactFlow>
+          </div>
+        </div>
       </div>
       <EmailModal isOpen={showEmailModal} onClose={() => setShowEmailModal(false)} onConfirm={handleSave} />
     </div>
